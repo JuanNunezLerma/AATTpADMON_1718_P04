@@ -335,9 +335,6 @@ public class ObtenerDatos {
          	
          	System.out.println(authCert);
          	return user; 
-    		
-  
-    	
        
     }
     }
