@@ -30,6 +30,8 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import javax.net.ssl.HttpsURLConnection;
+
 public class PeticionPost {
 	private URL url;
 	String data;
@@ -83,4 +85,37 @@ public class PeticionPost {
 		return respuesta;
 	}
 
+	public String conexionGET(String URL, String protocolo) {
+
+        String respuesta = "";
+        BufferedReader rd = null;
+
+        try {
+            URL url = new URL(URL);
+            if (protocolo.equals("HTTPS")) {
+                HttpsURLConnection conn1 = (HttpsURLConnection) url.openConnection();
+                rd = new BufferedReader(new InputStreamReader(conn1.getInputStream()));
+            } else {
+                URLConnection conn2 = url.openConnection();
+                rd = new BufferedReader(new InputStreamReader(conn2.getInputStream()));
+            }
+            String line;
+            while ((line = rd.readLine()) != null) {
+                //Process line...
+                respuesta += line;
+            }
+        } catch (Exception e) {
+            System.out.println("Web request failed");
+        // Web request failed
+        } finally {
+            if (rd != null) {
+                try {
+                    rd.close();
+                } catch (IOException ex) {
+                    System.out.println("Problema al cerrar el objeto lector");
+                }
+            }
+        }
+        return respuesta;
+	}
 }

@@ -1,10 +1,14 @@
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.Provider;
@@ -12,6 +16,7 @@ import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Date;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.swing.JOptionPane;
 
 
@@ -46,6 +51,8 @@ public class Main{
         String usuario;
         String nick, dni;
         
+        String claveServicio = JOptionPane.showInputDialog("Introduce la clave de servicio.");
+        
         try {
 	        usuario=user.getNombre();
 	        n=usuario.charAt(0);
@@ -57,23 +64,38 @@ public class Main{
 	        
 	        nick=n+ap1+ap2;
 	        dni=user.getNif();
+	        String clavePublica=user.getClavePublica();
+	        String clavePublicaB64 = Base64.getEncoder().encodeToString(clavePublica.getBytes());	      
 	        
 	        Date fecha = new Date();
 	        System.out.println(fecha);
 	        String fechaString = fecha.toString();
 	        
-	        String password=nick+dni+fechaString;
+	        String hash=nick+dni+fechaString+clavePublica+claveServicio;
 	        MessageDigest sha256=MessageDigest.getInstance("SHA-256");
-	        sha256.update(password.getBytes("UTF-8"));
-	        String hash=Base64.getEncoder().encodeToString(sha256.digest()); //2bb80d5...527a25b
-	        System.out.println(hash);
+	        sha256.update(hash.getBytes("UTF-8"));
+	        String hashB64=Base64.getEncoder().encodeToString(sha256.digest()); //2bb80d5...527a25b
+	        System.out.println(hashB64);
+	        
 	        
 	        try {
-		        PeticionPost post = new PeticionPost ("http://localhost:8081/p3/autentication");
-		        post.add("user", nick);
-		        post.add("pass", dni);
+	        	URL url = new URL("http://localhost:8081/p4/autenticar?nick="+nick+"&dni="+dni+"&fechaString="+fechaString+"&clavePublicaB64="+clavePublicaB64+"&hashB64="+hashB64);
+	            URLConnection con = url.openConnection();
+	       
+	            BufferedReader in = new BufferedReader(
+	               new InputStreamReader(con.getInputStream()));
+	       
+	            String respuesta;
+	            while ((respuesta = in.readLine()) != null) {
+	               System.out.println(respuesta);
+	            }
+		       
+	            
+	        	//PeticionPost post = new PeticionPost ("http://localhost:8081/p4/autenticar");
+		        //post.add("user", nick);
+		        //post.add("pass", dni);
 		        //post.add(propiedad, valor);
-		        String respuesta = post.getRespueta();
+		        //String respuesta = post.getRespueta();
 		        String respuestaOK = "200 OK";
 		        String respuestaBad = "400 BAD REQUEST";
 		        
@@ -97,6 +119,54 @@ public class Main{
         	JOptionPane.showMessageDialog(null, "No ha sido posible leer los datos");
         }
     }
+    
+	/*public String httpGetSimple(String url){
+	    String source = null;
+	 
+	    HttpClient httpClient = HttpClients.createDefault();
+	    HttpGet httpGet = new HttpGet(url);
+	    try {
+	    HttpResponse httpResponse = httpClient.execute(httpGet);
+	        source = EntityUtils.toString(httpResponse.getEntity());
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	    return source;
+	}*/
+	
+	public String conexionGET(String URL, String protocolo) {
+	
+	    String respuesta = "";
+	    BufferedReader rd = null;
+	
+	    try {
+	        URL url = new URL(URL);
+	        if (protocolo.equals("HTTPS")) {
+	            HttpsURLConnection conn1 = (HttpsURLConnection) url.openConnection();
+	            rd = new BufferedReader(new InputStreamReader(conn1.getInputStream()));
+	        } else {
+	            URLConnection conn2 = url.openConnection();
+	            rd = new BufferedReader(new InputStreamReader(conn2.getInputStream()));
+	        }
+	        String line;
+	        while ((line = rd.readLine()) != null) {
+	            //Process line...
+	            respuesta += line;
+	        }
+	    } catch (Exception e) {
+	        System.out.println("Web request failed");
+	    // Web request failed
+	    } finally {
+	        if (rd != null) {
+	            try {
+	                rd.close();
+	            } catch (IOException ex) {
+	                System.out.println("Problema al cerrar el objeto lector");
+	            }
+	        }
+	    }
+	    return respuesta;
+	}
         
-    }
+}
 

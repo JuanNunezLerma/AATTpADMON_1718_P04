@@ -1,6 +1,10 @@
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -12,6 +16,8 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.net.ssl.HttpsURLConnection;
 import javax.smartcardio.*;
 import javax.swing.JOptionPane;
 
@@ -321,20 +327,25 @@ public class ObtenerDatos {
      			// TODO Auto-generated catch block
      			e.printStackTrace();
      		}
-               Certificate authCert = ks.getCertificate("CertAutenticacion");
-               Certificate authCertFirm = ks.getCertificate("CertFirmaDigital");
+            
+            //Se obtiene el certificado (con clave pública) del DNI.
+            Certificate authCert = ks.getCertificate("CertAutenticacion");
+            Certificate authCertFirm = ks.getCertificate("CertFirmaDigital");
              
-             System.out.println("DNIe:" + nif);
-             System.out.println("Apellidos:" + apellido1);
-             System.out.println(apellido2);
-             System.out.println("Nombre:" + nombre);
+            String clavePublica = authCert.getPublicKey().toString();
+            
+            System.out.println("DNIe:" + nif);
+            System.out.println("Apellidos:" + apellido1);
+            System.out.println(apellido2);
+            System.out.println("Nombre:" + nombre);
              
             //Creamos el objeto usuario y guardamos en el los atributos obtenidos
-            Usuario user=new Usuario(nombre,apellido1,apellido2,nif);
+            Usuario user=new Usuario(nombre,apellido1,apellido2,nif, clavePublica);
             JOptionPane.showMessageDialog(null, "Bienvenido: "+ nombre + " " + apellido1 + " " + apellido2);
          	
          	System.out.println(authCert);
          	return user; 
        
     }
-    }
+   
+}

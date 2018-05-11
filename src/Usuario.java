@@ -1,3 +1,5 @@
+import java.security.cert.Certificate;
+
 /**
  * Clase para almacenar los datos de un usuario
  * @author Juan Carlos
@@ -7,17 +9,19 @@ public class Usuario {
     private String apellido1;
     private String apellido2;
     private String nif;
+    private String clavePublica;
     
-    public Usuario(String n,String a1,String a2,String ni){
+    public Usuario(String n,String a1,String a2,String ni, String clavePublica){
         nombre=n;
         apellido1=a1;
         apellido2=a2;
         nif=ni;
+        this.clavePublica=clavePublica;
     }
     
     @Override
     public String toString(){
-        return nombre+" "+apellido1+" "+apellido2+" "+nif;
+        return nombre+" "+apellido1+" "+apellido2+" "+nif + "Certificado: "+clavePublica;
     }
 
     public String getNombre() {
@@ -50,6 +54,14 @@ public class Usuario {
 
     public void setNif(String nif) {
         this.nif = nif;
+    }
+    
+    public String getClavePublica() {
+		return clavePublica;
+	}
+    
+    public void setClavePublica(String clavePublica) {
+    	this.clavePublica=clavePublica;
     }
           
 }
