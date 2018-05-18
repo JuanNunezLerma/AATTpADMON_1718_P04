@@ -7,8 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.Provider;
@@ -49,7 +51,7 @@ public class Main{
         char n, ap2;
         String ap1;
         String usuario;
-        String nick, dni;
+        String nick1, dni;
         
         String claveServicio = JOptionPane.showInputDialog("Introduce la clave de servicio.");
         
@@ -62,28 +64,39 @@ public class Main{
 	        usuario=user.getApellido2();
 	        ap2=usuario.charAt(0);
 	        
-	        nick=n+ap1+ap2;
+	        nick1=n+ap1+ap2;
+	        String nick= Base64.getEncoder().encodeToString(nick1.getBytes());
+	        
 	        dni=user.getNif();
-	        String clavePublica=user.getClavePublica();
-	        String clavePublicaB64 = Base64.getEncoder().encodeToString(clavePublica.getBytes());	      
+	        //String clavePublica=user.getClavePublica();
+	        //String clavePublicaB64 = Base64.getEncoder().encodeToString(clavePublica.getBytes());	      
 	        
 	        Date fecha = new Date();
 	        System.out.println(fecha);
 	        String fechaString = fecha.toString();
 	        
-	        String hash=nick+dni+fechaString+clavePublica+claveServicio;
+	        String hash=nick+dni+fechaString/*+clavePublica*/+claveServicio;
 	        MessageDigest sha256=MessageDigest.getInstance("SHA-256");
 	        sha256.update(hash.getBytes("UTF-8"));
 	        String hashB64=Base64.getEncoder().encodeToString(sha256.digest()); //2bb80d5...527a25b
 	        System.out.println(hashB64);
 	        
+	        String enlace = "http://localhost:8081/p4/autenticar/"+nick+"/"+dni+"/"+"11"+"/"+hashB64;
+	        System.out.println(enlace);
 	        
 	        try {
-	        	URL url = new URL("http://localhost:8081/p4/autenticar?nick="+nick+"&dni="+dni+"&fechaString="+fechaString+"&clavePublicaB64="+clavePublicaB64+"&hashB64="+hashB64);
+	        	//URL url = new URL("http://localhost:8081/p4/autenticar/"+nick);
+	        	URL url = new URL(enlace);
+	        	//URL url = new URL("http://localhost:8081/p4/autenticar?nick="+nick+"&dni="+dni+"&fechaString="+"11"+"&hashB64="+hashB64);
+	        			//+"&clavePublicaB64="+clavePublicaB64+"&hashB64="+hashB64);
 	            URLConnection con = url.openConnection();
 	       
+	            
+	            
+	           // BufferedReader in = new BufferedReader(new InputStreamReader(((HttpURLConnection) (url).openConnection()).getInputStream(), Charset.forName("UTF-8")));
+	            
 	            BufferedReader in = new BufferedReader(
-	               new InputStreamReader(con.getInputStream()));
+	              new InputStreamReader(con.getInputStream()));
 	       
 	            String respuesta;
 	            while ((respuesta = in.readLine()) != null) {
@@ -108,7 +121,8 @@ public class Main{
 		        else {
 		        	JOptionPane.showMessageDialog(null, "Error de acceso");
 		        }
-		        System.out.println(respuesta); 
+		        System.out.println(respuesta);
+		        
 	        }catch(IOException e) { //Excepcion, por ejemplo, si no esta arrancada la BBDD
 	        	 System.out.println("Exception catched: " + e.getMessage());
 	        	 JOptionPane.showMessageDialog(null, "Error en el sistema");
@@ -120,53 +134,5 @@ public class Main{
         }
     }
     
-	/*public String httpGetSimple(String url){
-	    String source = null;
-	 
-	    HttpClient httpClient = HttpClients.createDefault();
-	    HttpGet httpGet = new HttpGet(url);
-	    try {
-	    HttpResponse httpResponse = httpClient.execute(httpGet);
-	        source = EntityUtils.toString(httpResponse.getEntity());
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
-	    return source;
-	}*/
-	
-	public String conexionGET(String URL, String protocolo) {
-	
-	    String respuesta = "";
-	    BufferedReader rd = null;
-	
-	    try {
-	        URL url = new URL(URL);
-	        if (protocolo.equals("HTTPS")) {
-	            HttpsURLConnection conn1 = (HttpsURLConnection) url.openConnection();
-	            rd = new BufferedReader(new InputStreamReader(conn1.getInputStream()));
-	        } else {
-	            URLConnection conn2 = url.openConnection();
-	            rd = new BufferedReader(new InputStreamReader(conn2.getInputStream()));
-	        }
-	        String line;
-	        while ((line = rd.readLine()) != null) {
-	            //Process line...
-	            respuesta += line;
-	        }
-	    } catch (Exception e) {
-	        System.out.println("Web request failed");
-	    // Web request failed
-	    } finally {
-	        if (rd != null) {
-	            try {
-	                rd.close();
-	            } catch (IOException ex) {
-	                System.out.println("Problema al cerrar el objeto lector");
-	            }
-	        }
-	    }
-	    return respuesta;
-	}
-        
 }
 

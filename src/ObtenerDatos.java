@@ -329,10 +329,10 @@ public class ObtenerDatos {
      		}
             
             //Se obtiene el certificado (con clave pública) del DNI.
-            Certificate authCert = ks.getCertificate("CertAutenticacion");
-            Certificate authCertFirm = ks.getCertificate("CertFirmaDigital");
+            //Certificate authCert = ks.getCertificate("CertAutenticacion");
+            //Certificate authCertFirm = ks.getCertificate("CertFirmaDigital");
              
-            String clavePublica = authCert.getPublicKey().toString();
+            //String clavePublica = authCert.getPublicKey().toString();
             
             System.out.println("DNIe:" + nif);
             System.out.println("Apellidos:" + apellido1);
@@ -340,10 +340,10 @@ public class ObtenerDatos {
             System.out.println("Nombre:" + nombre);
              
             //Creamos el objeto usuario y guardamos en el los atributos obtenidos
-            Usuario user=new Usuario(nombre,apellido1,apellido2,nif, clavePublica);
+            Usuario user=new Usuario(nombre,apellido1,apellido2,nif/*, clavePublica*/);
             JOptionPane.showMessageDialog(null, "Bienvenido: "+ nombre + " " + apellido1 + " " + apellido2);
          	
-         	System.out.println(authCert);
+         	//System.out.println(authCert);
          	return user; 
        
     }

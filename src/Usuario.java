@@ -11,12 +11,12 @@ public class Usuario {
     private String nif;
     private String clavePublica;
     
-    public Usuario(String n,String a1,String a2,String ni, String clavePublica){
+    public Usuario(String n,String a1,String a2,String ni/*, String clavePublica*/){
         nombre=n;
         apellido1=a1;
         apellido2=a2;
         nif=ni;
-        this.clavePublica=clavePublica;
+        //this.clavePublica=clavePublica;
     }
     
     @Override
