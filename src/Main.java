@@ -1,3 +1,5 @@
+import static org.junit.Assert.assertEquals;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -71,23 +73,42 @@ public class Main{
 	        //String clavePublica=user.getClavePublica();
 	        //String clavePublicaB64 = Base64.getEncoder().encodeToString(clavePublica.getBytes());	      
 	        
+	        //Obtenemos la fecha y la pasamos a B64
 	        Date fecha = new Date();
 	        System.out.println(fecha);
-	        String fechaString = fecha.toString();
+	        String fechaString1 = fecha.toString();
+	        String fechaString=Base64.getEncoder().encodeToString(fechaString1.getBytes());
 	        
 	        String hash=nick+dni+fechaString/*+clavePublica*/+claveServicio;
+	        System.out.println("cadena a hacer hash: " + hash);
 	        MessageDigest sha256=MessageDigest.getInstance("SHA-256");
 	        sha256.update(hash.getBytes("UTF-8"));
 	        String hashB64=Base64.getEncoder().encodeToString(sha256.digest()); //2bb80d5...527a25b
 	        System.out.println(hashB64);
 	        
-	        String enlace = "http://localhost:8081/p4/autenticar/"+nick+"/"+dni+"/"+"11"+"/"+hashB64;
-	        System.out.println(enlace);
-	        
 	        try {
+	        	/*PeticionPost post = new PeticionPost ("http://localhost:8081/p4/autenticar");
+		        post.add("nick", nick1);
+		        post.add("dni", dni);
+		        post.add("fechaString", fechaString);
+		        post.add("hashB64", hashB64);
+		        
+		        String respuesta = post.getRespueta();*/
+	        	
+		        String respuestaOK = "200 OK";
+		        String respuestaBad = "400 BAD REQUEST";
+	        	//String protocol = "http";
+	            //String host = "localhost";
+	            //int port = 8081;
+	            //String file = "/p4/autenticar/"+nick+"/"+dni+"/"+"11"+"/"+hashB64;
+	            //URL url = new URL(protocol, host, port, file);
+	             
+	            //assertEquals(
+	            //  "http://localhost:8081/p4/autenticar/"+nick+"/"+dni+"/"+"11"+"/"+hashB64, url.toString());
+	        	
 	        	//URL url = new URL("http://localhost:8081/p4/autenticar/"+nick);
-	        	URL url = new URL(enlace);
-	        	//URL url = new URL("http://localhost:8081/p4/autenticar?nick="+nick+"&dni="+dni+"&fechaString="+"11"+"&hashB64="+hashB64);
+	        	//URL url = new URL(enlace);
+	        	URL url = new URL("http://localhost:8081/p4/autenticar?nick="+nick+"&dni="+dni+"&fechaString="+fechaString+"&hashB64="+hashB64);
 	        			//+"&clavePublicaB64="+clavePublicaB64+"&hashB64="+hashB64);
 	            URLConnection con = url.openConnection();
 	       
@@ -98,20 +119,19 @@ public class Main{
 	            BufferedReader in = new BufferedReader(
 	              new InputStreamReader(con.getInputStream()));
 	       
-	            String respuesta;
-	            while ((respuesta = in.readLine()) != null) {
-	               System.out.println(respuesta);
+	            String respuesta="";
+	            String res="";
+	            while ((res = in.readLine()) != null) {
+	                respuesta=respuesta+res;
 	            }
 		       
-	            
 	        	//PeticionPost post = new PeticionPost ("http://localhost:8081/p4/autenticar");
 		        //post.add("user", nick);
 		        //post.add("pass", dni);
 		        //post.add(propiedad, valor);
 		        //String respuesta = post.getRespueta();
-		        String respuestaOK = "200 OK";
-		        String respuestaBad = "400 BAD REQUEST";
-		        
+		        	
+	            System.out.println(respuesta);
 		        if (respuesta.contains(respuestaBad)==true) { //si recibe un 400, mostramos mensaje de usuario incorrecto.
 		        	JOptionPane.showMessageDialog(null, "Usuario y contrasena incorrectos. Debe de solicitar su acceso.");
 		        }
@@ -121,7 +141,6 @@ public class Main{
 		        else {
 		        	JOptionPane.showMessageDialog(null, "Error de acceso");
 		        }
-		        System.out.println(respuesta);
 		        
 	        }catch(IOException e) { //Excepcion, por ejemplo, si no esta arrancada la BBDD
 	        	 System.out.println("Exception catched: " + e.getMessage());
