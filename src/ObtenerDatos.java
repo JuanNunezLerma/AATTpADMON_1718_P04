@@ -29,8 +29,10 @@ import es.gob.jmulticard.jse.provider.DnieProvider;
  * La clase ObtenerDatos implementa cuatro mÃ©todos pÃºblicos que permiten obtener
  * determinados datos de los certificados de tarjetas DNIe, Izenpe y Ona.
  *
- * @author tbc
+ * @author Juan Núñez Lerma / Fernando Cabrera Caballero
+ * @version 1.0
  */
+
 public class ObtenerDatos {
 
     private static final byte[] dnie_v_1_0_Atr = {
@@ -220,7 +222,7 @@ public class ObtenerDatos {
     }
 
     /**
-     * Analizar los datos leÃ­dos del DNIe para obtener
+     * Analizar los datos leidos del DNIe para obtener
      *   - nombre
      *   - apellidos
      *   - NIF

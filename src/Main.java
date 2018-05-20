@@ -28,11 +28,9 @@ import javax.swing.JOptionPane;
  * Aplicaciones Telematicas para la AdministraciÃ³n
  * 
  * Este programa debe llevar el nombre y NIF de un usuario del DNIe, formar el identificador de usuario y autenticarse con un servidor remoto a traves de HTTP 
- * @author Juan Carlos Cuevas Martinez
+ * @author Juan Núñez Lerma / Fernando Cabrera Caballero
+ * @version 1.0
  */
-
-
-
 
 public class Main{
     /**
